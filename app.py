@@ -210,8 +210,17 @@ class ModuleButton(ctk.CTkButton):
             if os.path.exists(icon_path):
                 icon_image = Image.open(icon_path)
                 icon_image = icon_image.resize((24, 24), Image.Resampling.LANCZOS)
-                self.icon = ctk.CTkImage(icon_image, size=(24, 24))
-                self.configure(image=self.icon)
+                
+                # Handle transparency properly
+                if icon_image.mode in ('RGBA', 'LA') or 'transparency' in icon_image.info:
+                    # Convert to RGBA if not already
+                    if icon_image.mode != 'RGBA':
+                        icon_image = icon_image.convert('RGBA')
+                    self.icon = ctk.CTkImage(icon_image, size=(24, 24))
+                else:
+                    self.icon = ctk.CTkImage(icon_image, size=(24, 24))
+                    
+                self.configure(image=self.icon, compound="left")
             else:
                 self.configure(text=f"? {display_name}")
         except Exception:
