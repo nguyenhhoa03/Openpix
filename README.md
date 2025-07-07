@@ -162,10 +162,10 @@ Place PNG icons in the `icons/` directory with the same name as your module:
 
 ```
 icons/
-├── blur.png
-├── sharpen.png
-├── sepia.png
-└── crop.png
+├── blur.py.png
+├── sharpen.py.png
+├── sepia.py.png
+└── crop.py.png
 ```
 
 ## Configuration
@@ -246,4 +246,4 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 ---
 
-**Made with ❤️**
+**Made with ❤️, Free and open source forever**
