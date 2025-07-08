@@ -541,12 +541,18 @@ class OpenpixApp(ctk.CTk):
             # Store original file path
             self.original_file_path = image_path
             
-            # Get image extension
-            _, ext = os.path.splitext(image_path)
+            # Convert and save as PNG to temp directory
+            temp_path = os.path.join(self.temp_dir, "image0.png")
             
-            # Copy to temp directory
-            temp_path = os.path.join(self.temp_dir, f"image0{ext}")
-            shutil.copy2(image_path, temp_path)
+            # Open image and convert to PNG
+            with Image.open(image_path) as img:
+                # Convert to RGB if necessary (for JPEG compatibility)
+                if img.mode in ('RGBA', 'LA'):
+                    # Keep transparency for PNG
+                    img.save(temp_path, 'PNG')
+                else:
+                    # Convert to RGB for other formats
+                    img.convert('RGB').save(temp_path, 'PNG')
             
             # Update current image
             self.current_image_path = temp_path
@@ -563,7 +569,7 @@ class OpenpixApp(ctk.CTk):
         """Get current image path"""
         if not self.current_image_path:
             return None
-        return os.path.join(self.temp_dir, f"image{self.current_image_index}{os.path.splitext(self.current_image_path)[1]}")
+        return os.path.join(self.temp_dir, f"image{self.current_image_index}.png")
         
     def run_module(self, module_path):
         """Run a module on current image"""
@@ -575,8 +581,7 @@ class OpenpixApp(ctk.CTk):
         try:
             # Prepare next image path
             next_index = self.current_image_index + 1
-            ext = os.path.splitext(current_path)[1]
-            next_path = os.path.join(self.temp_dir, f"image{next_index}{ext}")
+            next_path = os.path.join(self.temp_dir, f"image{next_index}.png")
             
             # Remove future images (for undo/redo)
             self.remove_future_images(next_index)
@@ -616,11 +621,9 @@ class OpenpixApp(ctk.CTk):
         """Remove images with index >= from_index"""
         if not self.current_image_path:
             return
-            
-        ext = os.path.splitext(self.current_image_path)[1]
         
         for i in range(from_index, self.max_image_index + 10):  # Remove some extra just in case
-            image_path = os.path.join(self.temp_dir, f"image{i}{ext}")
+            image_path = os.path.join(self.temp_dir, f"image{i}.png")
             if os.path.exists(image_path):
                 os.remove(image_path)
                 
